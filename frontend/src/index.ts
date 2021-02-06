@@ -1,9 +1,9 @@
-import { getScreenSize } from "./utils";
+import { generateCoordMap } from "./utils";
+import type { ICoordMap } from "./types";
+
+const coordMap: ICoordMap = {};
 
 let socket = new WebSocket("ws://localhost:3030");
 socket.onopen = function (e) {
-  socket.send("My name is John");
+  generateCoordMap(window.location.pathname, coordMap, socket);
 };
-
-console.log(getScreenSize(true));
-console.log(getScreenSize(false));
