@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ES2018",
+    "allowJs": true,
+    "module": "commonjs",
+    "strict": true,
+    "noImplicitAny": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "outDir": "dist",
+    "declaration": true,
+    "moduleResolution": "Node",
+    "noUnusedLocals": true,
+    "noImplicitReturns": true,
+    "stripInternal": true,
+    "types": [],
+    "typeRoots": ["./node_modules/@types", "./custom_typings"],
+    "baseUrl": "src",
+    "paths": {}
+  },
+  "include": ["src", "custom_typings"]
+}
