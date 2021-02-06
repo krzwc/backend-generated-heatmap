@@ -1,23 +1,21 @@
 import * as WebSocket from 'ws';
+import type { ICoordMap, IMsg } from './types';
 
 const wss = new WebSocket.Server({ port: 3030 });
-
-/* wss.on('connection', (ws) => {
-  ws.on('message', (data) => {
-    wss.clients.forEach((client) => {
-      if (client !== ws && client.readyState === WebSocket.OPEN) {
-        // client.send(data);
-      }
-    });
-    console.log(data);
-    // ws.send(JSON.stringify({ name: 'BOT', text: 'Affirmative' }));
-  });
-}); */
+const coordMap: ICoordMap = {};
 
 wss.on('connection', function connection(ws) {
   ws.on('message', function incoming(message) {
-    console.log(message);
+    const { mapId, screenSize, xy }: IMsg = JSON.parse(
+      String(message),
+    );
+    if (!(mapId in coordMap)) {
+      coordMap[mapId] = {};
+    }
+    if (!(screenSize in coordMap[mapId])) {
+      coordMap[mapId][screenSize] = [];
+    }
+    coordMap[mapId][screenSize].push(xy);
+    console.log(JSON.stringify(coordMap));
   });
-
-  ws.send('something');
 });
