@@ -58,8 +58,8 @@ export const generateHeatMap = (
   const dimensions: IDimensions = {};
 
   if (dimensions && (dimensions.maxWidth || dimensions.maxHeight)) {
-    let sr: number = sw / sh;
-    let srr: number = sh / sw;
+    const sr: number = sw / sh;
+    const srr: number = sh / sw;
     if (!dimensions.maxWidth) {
       dimensions.maxWidth = 0;
     }
@@ -90,22 +90,22 @@ export const generateHeatMap = (
     dimensions.height || sh,
   );
 
-  let ctx: CanvasRenderingContext2D = canvas.getContext('2d'),
-    wr: number,
-    hr: number;
+  // creating a grayscale blurred circle image that will be used for drawing points
+  const ctx = canvas.getContext('2d');
+  let wr: number, hr: number;
 
-  wr = dimensions.width || sw / sw;
-  hr = dimensions.height || sh / sh;
+  wr = (dimensions.width || sw) / sw;
+  hr = (dimensions.height || sh) / sh;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  const coordsTotal: number = coordMap[mapId][screenSize].length;
-  ctx.filter = 'blur(5px)';
-  const alpha: number = 0.1 / mapIds.length;
+  const coordsTotal = coordMap[mapId][screenSize].length;
+  // ctx.filter = 'blur(5px)';
+  const alpha = 0.1 / mapIds.length;
   mapIds.forEach((mapId: string) => {
     // id = `_coordMap_${mapId}`;
     // coordMap = window[id];
     for (let i = 0; i < coordsTotal; i++) {
-      let [x, y]: number[] = coordMap[mapId][screenSize][i];
+      let [x, y] = coordMap[mapId][screenSize][i];
       if (dimensions) {
         x = x * wr;
         y = y * hr;
@@ -117,53 +117,42 @@ export const generateHeatMap = (
     }
   });
 
+  // Adding gradient
+  // creating a 256x1 gradient that will be used to turn a grayscale heatmap into a colored one
   const gradientCanvas = createCanvas(1, levels);
   const gradientCtx = gradientCanvas.getContext('2d');
   const gradient = gradientCtx.createLinearGradient(0, 0, 0, levels);
-  Object.entries(gradientColors).forEach(([k, v]) =>
-    gradient.addColorStop(Number(k), v),
-  );
+  Object.entries(gradientColors).forEach(([k, v]) => {
+    gradient.addColorStop(Number(k), v);
+  });
 
   gradientCtx.fillStyle = gradient;
   gradientCtx.fillRect(0, 0, 1, levels);
 
-  let gradientPixels = gradientCtx.getImageData(0, 0, 1, levels).data;
-  let imageData: any = ctx.getImageData(
+  const gradientPixels = gradientCtx.getImageData(0, 0, 1, levels)
+    .data;
+
+  // colorize the heatmap, using opacity value of each pixel to get the right color from our gradient
+  const imageData = ctx.getImageData(
     0,
     0,
     canvas.width,
     canvas.height,
   );
-  let pixels: any = imageData.data;
-  let len: number = pixels.length / 4;
+  const pixels = imageData.data;
+  let len = pixels.length / 4;
 
   while (len--) {
-    let idx: number = len * 4 + 3;
-    let alpha: number = pixels[idx] / 256;
+    let idx = len * 4 + 3;
+    const alpha = pixels[idx] / 256;
 
-    let colorOffset: number = Math.floor(alpha * 255);
+    const colorOffset = Math.floor(alpha * 255);
     pixels[idx - 3] = gradientPixels[colorOffset * 4];
     pixels[idx - 2] = gradientPixels[colorOffset * 4 + 1];
     pixels[idx - 1] = gradientPixels[colorOffset * 4 + 2];
   }
 
   ctx.putImageData(imageData, 0, 0);
-  const output: string = canvas.toDataURL('image/png');
+  const output = canvas.toDataURL('image/png');
   ws.send(output);
-  /* const output: string = canvas.toDataURL('image/png');
-  if (dest) {
-    let destElement: HTMLElement;
-    if (typeof dest === 'string') {
-      destElement =
-        ~dest.indexOf('#') || ~dest.indexOf('.')
-          ? document.querySelector(dest)
-          : document.getElementById(`${dest}`);
-    } else {
-      destElement = dest;
-    }
-    if (destElement) {
-      destElement.innerHTML = `<img src="${output}" />`;
-    }
-  }
-  return output; */
 };

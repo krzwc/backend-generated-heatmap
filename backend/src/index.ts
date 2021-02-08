@@ -18,7 +18,6 @@ wss.on('connection', function connection(ws) {
       coordMap[mapId][screenSize] = [];
     }
     coordMap[mapId][screenSize].push(xy);
-    // console.log(JSON.stringify(coordMap));
   });
   ws.on('close', function close() {
     clearInterval(interval);
