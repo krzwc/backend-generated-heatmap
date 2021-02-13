@@ -151,6 +151,15 @@ export const generateHeatMap = (
     pixels[idx - 2] = gradientPixels[colorOffset * 4 + 1];
     pixels[idx - 1] = gradientPixels[colorOffset * 4 + 2];
   }
+  /* for (let i = 0; i < pixels.length; i += 4) {
+    const r = pixels[i];
+    const g = pixels[i + 1];
+    const b = pixels[i + 2];
+    const y = 0.299 * r + 0.587 * g + 0.114 * b;
+    pixels[i] = y;
+    pixels[i + 1] = y;
+    pixels[i + 2] = y;
+  } */
 
   ctx.putImageData(imageData, 0, 0);
   const output = canvas.toDataURL('image/png');
